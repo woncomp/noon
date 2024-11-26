@@ -72,7 +72,7 @@ impl Create<CircleId> for CircleBuilder<'_> {
     }
     fn make(&mut self) -> CircleId {
         let depth = self.scene.increment_counter();
-        let world = &mut self.scene.world;
+        let world = self.scene.world.get_mut();
         let position = self.position;
         let scale = Scale::ONE;
         let path = Circle::path(&Size::from_radius(self.radius));

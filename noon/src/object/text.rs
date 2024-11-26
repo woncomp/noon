@@ -89,7 +89,7 @@ impl Create<TextId> for TextBuilder<'_> {
     }
     fn make(&mut self) -> TextId {
         let depth = self.scene.increment_counter();
-        let world = &mut self.scene.world;
+        let world = self.scene.world.get_mut();
         let position = self.position;
         let scale = Scale::ONE;
         let (path, size) = Text::path(&self.text, self.font_size);
