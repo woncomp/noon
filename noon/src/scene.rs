@@ -124,6 +124,7 @@ impl Scene {
                     animate_with_relative::<FontSize>,
                 ),
                 (init_from_target::<Path>, print),
+                animate::<Path>,
                 update_screen_paths,
             )
                 .chain(),
