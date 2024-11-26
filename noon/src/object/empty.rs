@@ -43,7 +43,7 @@ impl Create<EmptyId> for EmptyBuilder<'_> {
     }
     fn make(&mut self) -> EmptyId {
         // let depth = self.scene.increment_counter();
-        let world = &mut self.scene.world;
+        let world = self.scene.world.get_mut();
         let id = world
             .spawn_empty()
             .insert(Empty)

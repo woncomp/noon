@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+
 use bevy_ecs::prelude::*;
 use nannou::geom::Rect;
 
@@ -77,9 +79,8 @@ impl Bounds {
 }
 
 pub struct Scene {
-    pub(crate) world: World,
+    pub(crate) world: RefCell<World>,
     pub(crate) updater: Schedule,
-    pub(crate) drawer: Schedule,
     pub(crate) event_time: f32,
     pub(crate) clock_time: f32,
     pub(crate) creation_count: u32,
@@ -108,7 +109,7 @@ impl Scene {
                     init_from_target::<Angle>,
                     init_from_target::<Opacity>,
                     init_from_target::<PathCompletion>,
-                    init_from_target::<FontSize>
+                    init_from_target::<FontSize>,
                 ),
                 (
                     animate_position,
@@ -123,17 +124,14 @@ impl Scene {
                     animate_with_relative::<FontSize>,
                 ),
                 (init_from_target::<Path>, print),
-                update_screen_paths
+                update_screen_paths,
             )
-                .chain()
+                .chain(),
         );
-        let mut drawer = Schedule::default();
-        drawer.add_systems(draw);
 
         Self {
-            world,
+            world: RefCell::new(world),
             updater,
-            drawer,
             event_time: 0.5,
             clock_time: 0.0,
             creation_count: 0,
@@ -187,26 +185,32 @@ impl Scene {
     pub fn update(&mut self, now: f32, win_rect: Rect) {
         // let now = self.clock_time;
         self.world
+            .get_mut()
             .get_resource_mut::<Time>()
             .map(|mut t| t.seconds = now);
         self.world
+            .get_mut()
             .get_resource_mut::<Bounds>()
             .map(|mut bounds| *bounds = Bounds::new(win_rect));
 
-        self.updater.run(&mut self.world);
+        self.updater.run(&mut self.world.get_mut());
         // self.clock_time += 1. / 60.;
         self.clock_time = now;
     }
 
-    pub fn draw(&mut self, nannou_draw: nannou::Draw) {
+    pub fn draw(&self, nannou_draw: nannou::Draw) {
         // use nannou::glam::{Mat4, Vec3};
-        self.world.remove_non_send_resource::<nannou::Draw>();
-        self.world.insert_non_send_resource(
+        let mut _world = self.world.borrow_mut();
+        _world.remove_non_send_resource::<nannou::Draw>();
+        _world.insert_non_send_resource(
             nannou_draw
                 // .transform(Mat4::from_scale(Vec3::new(TO_PXL, TO_PXL, 1.0)))
                 .clone(),
         );
-        self.drawer.run(&mut self.world);
+
+        let mut drawer = Schedule::default();
+        drawer.add_systems(draw);
+        drawer.run(&mut *_world);
     }
 
     pub fn wait(&mut self) {

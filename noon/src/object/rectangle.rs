@@ -61,7 +61,7 @@ impl Create<RectangleId> for RectangleBuilder<'_> {
     }
     fn make(&mut self) -> RectangleId {
         let depth = self.scene.increment_counter();
-        let world = &mut self.scene.world;
+        let world = self.scene.world.get_mut();
         let scale = Scale::ONE;
         let path = Rectangle::path(&self.size);
         let transform = Transform::identity()
