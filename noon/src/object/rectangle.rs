@@ -102,7 +102,7 @@ pub fn rectangle(scene: &mut Scene) -> RectangleBuilder {
     RectangleBuilder::new(scene)
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct RectangleId(pub(crate) Entity);
 crate::into_entity!(RectangleId);
 

@@ -35,6 +35,7 @@ pub enum EaseType {
     Bounce,
     BounceIn,
     BounceOut,
+    Instance,
 }
 
 impl EaseType {
@@ -71,6 +72,7 @@ impl EaseType {
             EaseType::Bounce => bounce::ease_in_out,
             EaseType::BounceIn => bounce::ease_in,
             EaseType::BounceOut => bounce::ease_out,
+            EaseType::Instance => linear::instance,
         };
         ease_func(t, 0.0, 1.0, 1.0)
     }
@@ -84,8 +86,20 @@ impl Default for EaseType {
 // Linear takes normalized time and returns unmodified value.
 // This is the default ease function in addition to pennereq crate.
 pub mod linear {
+    use num_traits::{zero, Float};
+
     #[inline]
     pub fn ease<T>(t: T, _b: T, _c: T, _d: T) -> T {
         t
+    }
+
+    #[inline]
+    pub fn instance<T: Float + From<f32>>(t: T, b: T, c: T, d: T) -> T {
+        let t = t / d;
+        if t > zero::<T>() {
+            b + c
+        } else {
+            b
+        }
     }
 }

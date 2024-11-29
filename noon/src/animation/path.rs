@@ -7,7 +7,7 @@ pub trait WithPath: WithId {
             entity: self.id(),
             animations: vec![
                 Animation::<Opacity>::to(Opacity::FULL)
-                    .with_duration(0.0)
+                    .with_rate_func(EaseType::Instance)
                     .into(),
                 Animation::<PathCompletion>::to(PathCompletion(1.0)).into(),
             ],
@@ -18,7 +18,7 @@ pub trait WithPath: WithId {
             entity: self.id(),
             animations: vec![
                 Animation::<PathCompletion>::to(PathCompletion(1.0))
-                    .with_duration(0.0)
+                    .with_rate_func(EaseType::Instance)
                     .into(),
                 Animation::to(Opacity(1.0)).into(),
             ],
